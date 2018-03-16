@@ -51,7 +51,7 @@ class static_press {
 			isset($parsed['scheme'])
 			? $parsed['scheme']
 			: 'http';
-		$host     = 
+		$host     =
 			isset($parsed['host'])
 			? $parsed['host']
 			: (defined('DOMAIN_CURRENT_SITE') ? DOMAIN_CURRENT_SITE : $_SERVER['HTTP_HOST']);
@@ -145,7 +145,7 @@ CREATE TABLE `{$this->url_table}` (
 		if (!defined('WP_DEBUG_DISPLAY'))
 			define('WP_DEBUG_DISPLAY', false);
 
-		if (!is_user_logged_in())
+		if (!is_user_logged_in() && !class_exists('WP_CLI'))
 			wp_die('Forbidden');
 
 		$urls = $this->insert_all_url();
@@ -163,7 +163,7 @@ CREATE TABLE `{$this->url_table}` (
 	}
 
 	public function ajax_fetch(){
-		if (!is_user_logged_in())
+		if (!is_user_logged_in() && !class_exists('WP_CLI'))
 			wp_die('Forbidden');
 
 		if (!defined('WP_DEBUG_DISPLAY'))
@@ -237,7 +237,7 @@ CREATE TABLE `{$this->url_table}` (
 		if (!defined('WP_DEBUG_DISPLAY'))
 			define('WP_DEBUG_DISPLAY', false);
 
-		if (!is_user_logged_in())
+		if (!is_user_logged_in() && !class_exists('WP_CLI'))
 			wp_die('Forbidden');
 
 		$static_file = $this->create_static_file($this->get_site_url().'404.html');
@@ -259,7 +259,7 @@ CREATE TABLE `{$this->url_table}` (
 
 	public function static_url($permalink) {
 		return urldecode(
-			preg_match('/\.[^\.]+?$/i', $permalink) 
+			preg_match('/\.[^\.]+?$/i', $permalink)
 			? $permalink
 			: trailingslashit(trim($permalink)) . 'index.html');
 	}
@@ -832,7 +832,7 @@ select MAX(P.post_modified) as last_modified, count(P.ID) as count
 
 		$authors = $wpdb->get_results("
 SELECT DISTINCT post_author, COUNT(ID) AS count, MAX(post_modified) AS modified
- FROM {$wpdb->posts} 
+ FROM {$wpdb->posts}
  where post_status = 'publish'
    and post_type in ({$this->post_types})
  group by post_author
@@ -899,7 +899,7 @@ SELECT DISTINCT post_author, COUNT(ID) AS count, MAX(post_modified) AS modified
 			);
 		$count = intval($wpdb->get_var($sql));
 		wp_cache_set('StaticPress::'.$link, $count, 'static_press');
-		
+
 		return $count > 0;
 	}
 
@@ -968,7 +968,7 @@ SELECT DISTINCT post_author, COUNT(ID) AS count, MAX(post_modified) AS modified
 		    (?: [\x00-\x7F]                 # single-byte sequences   0xxxxxxx
 		    |   [\xC0-\xDF][\x80-\xBF]      # double-byte sequences   110xxxxx 10xxxxxx
 		    |   [\xE0-\xEF][\x80-\xBF]{2}   # triple-byte sequences   1110xxxx 10xxxxxx * 2
-		    |   [\xF0-\xF7][\x80-\xBF]{3}   # quadruple-byte sequence 11110xxx 10xxxxxx * 3 
+		    |   [\xF0-\xF7][\x80-\xBF]{3}   # quadruple-byte sequence 11110xxx 10xxxxxx * 3
 		    ){1,100}                        # ...one or more times
 		  )
 		| .                                 # anything else

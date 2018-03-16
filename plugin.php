@@ -54,5 +54,20 @@ add_filter('https_local_ssl_verify', '__return_false');
 register_activation_hook(__FILE__, array($staticpress, 'activate'));
 register_deactivation_hook(__FILE__, array($staticpress, 'deactivate'));
 
+if (class_exists('WP_CLI')) {
+    WP_CLI::add_command('staticpress init', function () {
+        $_staticpress = static_press::$instance;
+        $_staticpress->ajax_init();
+    });
+    WP_CLI::add_command('staticpress fetch', function () {
+        $_staticpress = static_press::$instance;
+        $_staticpress->ajax_fetch();
+    });
+    WP_CLI::add_command('staticpress finalyze', function () {
+        $_staticpress = static_press::$instance;
+        $_staticpress->ajax_finalyze();
+    });
+}
+
 if (is_admin())
 	new static_press_admin(plugin_basename(__FILE__));
